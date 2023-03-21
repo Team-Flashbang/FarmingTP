@@ -1,8 +1,10 @@
 {
   "cSpell.words": [
+    "Bukkit",
     "farmingtp",
     "Farmworld",
-    "fbhosting"
+    "fbhosting",
+    "Teleporter"
   ],
   "java.compile.nullAnalysis.mode": "automatic"
 }
