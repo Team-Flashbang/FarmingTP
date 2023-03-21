@@ -14,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -22,6 +21,7 @@ import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.fbhosting.farmingtp.utils.LocationUtils;
+import net.fbhosting.farmingtp.utils.TimeoutManager;
 
 @Slf4j
 public class Farming implements CommandExecutor, TabCompleter {
@@ -29,9 +29,11 @@ public class Farming implements CommandExecutor, TabCompleter {
   private final MVWorldManager worldManager = multiverseCore.getMVWorldManager();
   private final SafeTTeleporter teleporter = multiverseCore.getSafeTTeleporter();
   private final LocationUtils utils = new LocationUtils();
+  private final TimeoutManager timeoutManager;
   private final JavaPlugin plugin;
 
   public Farming(JavaPlugin plugin) {
+    this.timeoutManager = new TimeoutManager(plugin.getConfig().getInt("general.timeout"));
     this.plugin = plugin;
   }
 
@@ -40,6 +42,13 @@ public class Farming implements CommandExecutor, TabCompleter {
     // only allow commands from players
     if (!(sender instanceof Player)) return false;
     Player player = (Player) sender;
+
+    // check if player is in timeout
+    if (this.timeoutManager.isBlocked(player)) {
+      player.sendMessage("You need to wait " + this.timeoutManager.getRemainingTime(player) + " before using this command again.");
+      return true;
+    }
+    this.timeoutManager.block(player);
 
     // get default value and possible values
     List<String> possibleKeys = this.plugin.getConfig().getConfigurationSection("worlds").getKeys(true).stream().toList();
@@ -66,7 +75,8 @@ public class Farming implements CommandExecutor, TabCompleter {
     this.worldManager.loadWorld(worldName);
 
     // find location
-    Location location = utils.createSafeLocation(world.getCBWorld(), 10); // TODO: add config field
+    int maxAttempts = this.plugin.getConfig().getInt("general.maxTries");
+    Location location = utils.createSafeLocation(world.getCBWorld(), maxAttempts);
     if (location == null) {
       player.sendMessage("Failed to find a safe location. Please try again.");
       return true;
