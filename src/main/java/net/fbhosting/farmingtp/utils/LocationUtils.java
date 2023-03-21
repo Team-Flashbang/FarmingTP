@@ -13,7 +13,6 @@ public class LocationUtils {
   private final Random random = new Random();
 
   // list of unsafe blocks
-  // TODO: move this to configuration
   private final Set<Material> unsafeMaterials = Set.of(
     Material.LAVA,
     Material.WATER,
@@ -60,7 +59,7 @@ public class LocationUtils {
           && !unsafeMaterials.contains(below.getType())
           && !above.isSolid()
           && !block.isSolid()
-          // && below.isSolid() // FIXME: why is this not working when enabled?
+          // && below.isSolid() // disabled because it breaks nether check
           && y < 126; // nether roof
 
       case THE_END:
