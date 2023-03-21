@@ -1,0 +1,5 @@
+worlds:
+  normal: farming
+  nether: farming_nether
+  end: farming_the_end
+

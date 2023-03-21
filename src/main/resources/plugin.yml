@@ -1,0 +1,9 @@
+name: FarmingTP
+version: '${project.version}'
+main: net.fbhosting.farmingtp.FarmingTP
+api-version: 1.19
+commands:
+  farming:
+    description: Teleports the Player to a specific Farmworld!
+    usage: /farming <normal | nether | end>
+depend: [Multiverse-Core]
