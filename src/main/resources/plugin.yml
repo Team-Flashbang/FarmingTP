@@ -1,9 +1,35 @@
 name: FarmingTP
+description: A Minecraft Plugin that randomly teleports the player in a list of specified farming worlds.
 version: '${project.version}'
+
+author: Flashbang Hosting
+website: https://fb-hosting.net/
+
 main: net.fbhosting.farmingtp.FarmingTP
 api-version: 1.19
+
+depend: 
+  - Multiverse-Core
+
 commands:
   farming:
-    description: Teleports the Player to a specific Farmworld!
-    usage: /farming <normal | nether | end>
-depend: [Multiverse-Core]
+    description: Teleport to the specified farming world.
+    usage: /farming [world]
+  
+permissions:
+  farmingtp.*:
+    description: Gives full access to the plugin.
+    default: op;
+    children:
+      farmingtp.teleport: true
+      farmingtp.reload: true
+      farmingtp.bypass: true
+  farmingtp.teleport:
+    description: Teleports yourself to the specified farming world.
+    default: true
+  farmingtp.bypass:
+    description: Bypasses the teleport timeout.
+    default: op
+  farmingtp.reload:
+    description: Reloads the plugin.
+    default: op

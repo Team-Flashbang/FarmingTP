@@ -1,6 +1,5 @@
 package net.fbhosting.farmingtp.commands;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -43,8 +42,14 @@ public class Farming implements CommandExecutor, TabCompleter {
     if (!(sender instanceof Player)) return false;
     Player player = (Player) sender;
 
+    // permission check
+    if (!player.hasPermission(command.getPermission())) {
+      player.sendMessage("You are lacking the required permissions.");
+      return true;
+    }
+
     // check if player is in timeout
-    if (this.timeoutManager.isBlocked(player)) {
+    if (!player.hasPermission("farmingtp.bypass") && this.timeoutManager.isBlocked(player)) {
       player.sendMessage("You need to wait " + this.timeoutManager.getRemainingTime(player) + " before using this command again.");
       return true;
     }

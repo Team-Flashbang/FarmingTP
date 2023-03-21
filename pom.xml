@@ -10,7 +10,8 @@
   <packaging>jar</packaging>
 
   <name>FarmingTP</name>
-  <description>A Minecraft Plugin that randomly releports the player in a list of specified worlds.</description>
+  <description>A Minecraft Plugin that randomly teleports the player in a list of specified farming worlds.</description>
+  <url>https://fb-hosting.net/</url>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>

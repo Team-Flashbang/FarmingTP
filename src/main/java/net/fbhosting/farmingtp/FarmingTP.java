@@ -22,6 +22,7 @@ public final class FarmingTP extends JavaPlugin implements Listener {
     saveDefaultConfig();
 
     // register commands
+    getCommand("farming").setPermission("farmingtp.teleport");
     getCommand("farming").setExecutor(new Farming(this));;
   }
 
