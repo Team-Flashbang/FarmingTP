@@ -1,7 +1,6 @@
 general:
-  maxTries: 10
-  unsafeBlocks:
-  -
+  maxTries: 5
+  timeout: 100
 
 worlds:
   normal: farming
