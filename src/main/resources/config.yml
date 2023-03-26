@@ -1,9 +1,15 @@
 general:
   maxTries: 5
   timeout: 100
+  worlds:
+    normal: farming
+    nether: farming_nether
+    end: farming_the_end
 
-worlds:
-  normal: farming
-  nether: farming_nether
-  end: farming_the_end
-
+locale:
+  missingPermission: "You are lacking the required permissions."
+  invalidArgument: "Sorry, but you specified an invalid argument."
+  noSafeLocation: "Failed to find a safe location. Please try again."
+  worldNotFound: "Failed to find world. Please contact a server administrator."
+  timeout: "You need to wait {seconds} seconds before using this command again."
+  teleport: "Teleporting..."
