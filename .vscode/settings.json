@@ -5,6 +5,7 @@
     "Farmworld",
     "fbhosting",
     "Flashbang",
+    "NOSONAR",
     "Teleporter"
   ],
   "java.compile.nullAnalysis.mode": "automatic",
