@@ -1,0 +1,74 @@
+trigger:
+  - main
+  - development
+
+variables:
+  GIT_USER_NAME: "Team Flashbang"
+  GIT_USER_EMAIL: "dev@fb-hosting.net"
+  MIRROR_REPO_URL: "git@github.com:Team-Flashbang/FarmingTP.git"
+  VERSION_BRANCH_DEVELOPMENT: "development"
+  VERSION_BRANCH_RELEASE: "main"
+  VERSION_IDENTIFIER_MAJOR: "breaking:.*"
+  VERSION_IDENTIFIER_MINOR: "feature:.*"
+  VERSION_SNAPSHOT_SUFFIX: "SNAPSHOT"
+  TOOL_VERSION: 0.1.0
+
+jobs:
+  - job: deploy
+    displayName: Deploy Artifacts
+    workspace:
+      clean: all
+    pool:
+      name: Default
+    steps:
+      - checkout: self
+        clean: true
+        persistCredentials: true
+      - script: |
+          git fetch --unshallow
+          git switch $(basename $(Build.SourceBranch))
+          git config --global user.email "$(GIT_USER_EMAIL)"
+          git config --global user.name "$(GIT_USER_NAME)"
+        displayName: Re-Attach Head
+      - script: |
+          mkdir -p /tmp/git-version-java/
+          curl -L -o /tmp/git-version-java/app.jar https://github.com/parzival-space/git-version-java/releases/download/v$(TOOL_VERSION)/git-version-$(TOOL_VERSION)-jar-with-dependencies.jar
+          detectedVersion=$(java -jar /tmp/git-version-java/app.jar --major-identifier "$(VERSION_IDENTIFIER_MAJOR)" --minor-identifier "$(VERSION_IDENTIFIER_MINOR)" --suffix "$(VERSION_SNAPSHOT_SUFFIX)" --release-branch "$(VERSION_BRANCH_RELEASE)" --snapshot-branch "$(VERSION_BRANCH_DEVELOPMENT)" --no-hash)
+          echo "Detected version: $detectedVersion"
+          echo "##vso[task.setvariable variable=projectVersion]$detectedVersion"
+        displayName: Detect Project Version
+      - script: |
+          mvn versions:set -D"newVersion=$(projectVersion)"
+          mvn deploy
+        displayName: Deploy Artifacts
+      - script: |
+          if ! echo "$(projectVersion)" | grep -q "SNAPSHOT"; then
+              echo "Creating Git Tag..."
+              git tag v$(projectVersion)
+              git push origin v$(projectVersion)
+          else
+              echo "Not creating Git Tag for snapshot build..."
+          fi
+        displayName: Create Git Tag
+
+  - job: mirror
+    displayName: Mirror to GitHub
+    dependsOn: deploy
+    condition: and( succeeded('deploy'), eq(variables['Build.SourceBranch'], 'refs/heads/${{ variables['VERSION_BRANCH_RELEASE'] }}') )
+    pool:
+      name: Default
+    steps:
+      - checkout: self
+        clean: true
+        persistCredentials: true
+      - script: |
+          git fetch --unshallow
+          git switch $(basename $(Build.SourceBranch))
+          git config --global user.email "$(GIT_USER_EMAIL)"
+          git config --global user.name "$(GIT_USER_NAME)"
+        displayName: Update Git
+      - script: |
+          git pull
+          git remote set-url origin "$(MIRROR_REPO_URL)"
+          git push --force
+        displayName: Mirror to GitHub
